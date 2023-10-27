@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "starkbank-backend-test"
+version = "0.1.0"
+description = ""
+authors = ["João Pedro Prado <joaopedro0128@hotmail.com>"]
+readme = "README.md"
+packages = [{include = "starkbank_backend_test"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+starkbank = "^2.22.0"
+django = "^4.2.6"
+django-rest-framework = "^0.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
