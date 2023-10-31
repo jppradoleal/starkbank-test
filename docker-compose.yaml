@@ -12,6 +12,38 @@ services:
     depends_on:
       - redis
       - localstack
+  celery_worker:
+    build:
+      context: .
+    command: |
+      worker
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    environment:
+      - C_FORCE_ROOT=true
+    ports:
+      - 5679:5679
+    depends_on:
+      - redis
+      - localstack
+  celery_beat:
+    build:
+      context: .
+    command: |
+      beat
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    environment:
+      - C_FORCE_ROOT=true
+    ports:
+      - 5680:5680
+    depends_on:
+      - redis
+      - localstack
   redis:
     image: redis:7.2
     ports:
