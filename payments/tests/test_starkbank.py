@@ -1,6 +1,8 @@
-from ..services import starkbank_service
 from unittest.mock import patch
-from ddd.domain import Invoice, Transfer, AccountType
+
+from ddd.domain import AccountType, Invoice, Transfer
+
+from ..services import starkbank_service
 
 
 def test_create_invoices(faker):

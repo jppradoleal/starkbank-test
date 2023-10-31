@@ -1,9 +1,11 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Annotated, TypedDict
+
 
 class Description(TypedDict):
     key: str
     value: Annotated[str, 20]
+
 
 @dataclass
 class Invoice:

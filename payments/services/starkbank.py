@@ -1,7 +1,9 @@
-import starkbank
 import os
+
+import starkbank
+
 from ddd.domain import Invoice, Transfer
-from ddd.use_cases import CreateInvoice, CreateTransfer, ParseEvent, HandleInvoiceEvent
+from ddd.use_cases import CreateInvoice, CreateTransfer, HandleInvoiceEvent, ParseEvent
 from payments import tasks
 
 

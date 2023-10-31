@@ -1,7 +1,8 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from django.test.client import Client
-from starkbank.error import InvalidSignatureError
 from rest_framework.reverse import reverse
+from starkbank.error import InvalidSignatureError
 
 
 class TestWebhook:

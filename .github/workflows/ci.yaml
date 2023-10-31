@@ -1,0 +1,52 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+
+jobs:
+  build-project:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'poetry'
+      - name: Install dependencies
+        if: steps.setup-python.outputs.cache-hit != 'true'
+        run: poetry install -n
+      - name: Linting
+        run: |
+          poetry run isort --check .
+          poetry run black --check .
+          poetry run ruff check .
+      - name: Tests
+        run: poetry run pytest
+
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    needs: build-project
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Login to GHCR'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: 'Build and push image'
+        run: |
+          docker build . --tag ghcr.io/jppradoleal/starkbank:latest
+          docker push ghcr.io/jppradoleal/starkbank:latest

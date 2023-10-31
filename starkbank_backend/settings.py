@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +27,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "fake_unsecure_secret_key")
 DEBUG = os.getenv("ENV", "dev") == "dev"
 
 ALLOWED_HOSTS = [
-  ".loca.lt"
+    "localhost",
+    ".loca.lt"
 ]
 
 

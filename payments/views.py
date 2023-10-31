@@ -1,9 +1,9 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
+from rest_framework import status, viewsets
 from rest_framework.request import Request
-from rest_framework import status
-from .services import starkbank_service
+from rest_framework.response import Response
 from starkbank import Event, error
+
+from .services import starkbank_service
 
 
 class WebhookViewSet(viewsets.ViewSet):
