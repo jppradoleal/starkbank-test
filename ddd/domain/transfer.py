@@ -20,4 +20,6 @@ class Transfer:
     account_type: AccountType
 
     def asdict(self) -> dict:
-        return asdict(self)
+        result = asdict(self)
+        result["account_type"] = self.account_type.value
+        return result

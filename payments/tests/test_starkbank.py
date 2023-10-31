@@ -23,7 +23,7 @@ def test_create_invoices(faker):
 
 def test_create_transfer(faker):
     with patch("starkbank.transfer.create") as mock:
-        starkbank_service.create_transfer(
+        starkbank_service.create_transfers(
             [
                 Transfer(
                     amount=100,
@@ -32,9 +32,17 @@ def test_create_transfer(faker):
                     bank_code="20018183",
                     branch_code="0001",
                     account_number="6341320293482496",
-                    account_type=AccountType.PAYMENT
+                    account_type=AccountType.PAYMENT,
                 )
             ]
         )
 
         mock.assert_called_once()
+
+
+def test_handle_invoice_event(faker):
+    invoice = {"amount": 100, "fee": 10}
+    with patch("payments.tasks.send_transfers.delay") as mock:
+        starkbank_service.handle_invoice_event(invoice)
+
+        mock.assert_called_once_with(amount=90)

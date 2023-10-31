@@ -1,8 +1,8 @@
 import abc
-from ddd.domain.invoice import Invoice
+from ddd.domain import Invoice
 
 
 class CreateInvoice(abc.ABC):
     @abc.abstractmethod
-    def create(self, invoice: Invoice):
+    def create_invoices(self, invoices: list[Invoice]):
         ...

@@ -1,12 +1,18 @@
 from celery import shared_task
 from random import randint
-from ddd.domain.invoice import Invoice
+from ddd.domain import Invoice, Transfer, AccountType
 from faker import Faker
 from .services import starkbank_service
 from celery_batches import Batches
+import starkbank
 
 
-@shared_task(soft_time_limit=15, time_limit=30, retry_backoff=True, retry_kwargs={'max_retries': 3})
+@shared_task(
+    soft_time_limit=15,
+    time_limit=30,
+    autoretry_for=(starkbank.error.InternalServerError, starkbank.error.UnknownError,),
+    retry_backoff=True,
+    retry_kwargs={'max_retries': 3})
 def send_invoices():
     fake = Faker("pt-BR")
     invoices = [
@@ -30,7 +36,22 @@ def send_invoices():
     flush_interval=10,
     soft_time_limit=15,
     time_limit=30,
+    autoretry_for=(starkbank.error.InternalServerError, starkbank.error.UnknownError,),
     retry_backoff=True,
     retry_kwargs={'max_retries': 3})
-def send_transfers(transfer):
-    starkbank_service.create_transfer([transfer])
+def send_transfers(requests):
+    amounts = [request.kwargs["amount"] for request in requests]
+    
+    print(f"Transfering: {amounts}")
+    
+    transfer = Transfer(
+        amount=sum(amounts),
+        account_number="6341320293482496",
+        account_type=AccountType.PAYMENT,
+        bank_code="20018183",
+        branch_code="0001",
+        tax_id="20.018.183/0001-80",
+        name="Stark Bank S.A."
+    )
+
+    starkbank_service.create_transfers([transfer])

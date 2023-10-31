@@ -1,9 +1,11 @@
 import starkbank
 import os
 from ddd.domain import Invoice, Transfer
+from ddd.use_cases import CreateInvoice, CreateTransfer, ParseEvent, HandleInvoiceEvent
+from payments import tasks
 
 
-class StarkbankService:
+class StarkbankService(CreateInvoice, CreateTransfer, ParseEvent, HandleInvoiceEvent):
     __project = None
 
     def __init__(self, private_key) -> None:
@@ -20,15 +22,29 @@ class StarkbankService:
 
         return starkbank.invoice.create(invoice_objects)
 
-    def create_transfer(self, transfers: list[Transfer]):
+    def create_transfers(self, transfers: list[Transfer]):
         transfer_objects = [
             starkbank.Transfer(**transfer.asdict()) for transfer in transfers
         ]
 
         return starkbank.transfer.create(transfer_objects)
 
+    def parse_event(self, payload, signature) -> starkbank.Event:
+        return starkbank.event.parse(payload, signature)
 
-with open(os.getenv("STARKBANK_PRIVATE_KEY_FILE", "./stark-priv-key.pem"), "r") as f:
-    STARKBANK_PRIVATE_KEY = f.read()
+    def handle_invoice_event(self, invoice):
+        amount = invoice["amount"]
+        fees = invoice["fee"]
 
-starkbank_service = StarkbankService(STARKBANK_PRIVATE_KEY)
+        tasks.send_transfers.delay(amount=amount - fees)
+
+
+def get_private_key_content():
+    with open(
+        os.getenv("STARKBANK_PRIVATE_KEY_FILE", "./stark-priv-key.pem"), "r"
+    ) as f:
+        private_key_content = f.read()
+    return private_key_content
+
+
+starkbank_service = StarkbankService(get_private_key_content())
