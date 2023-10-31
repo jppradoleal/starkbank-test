@@ -19,9 +19,9 @@ class WebhookViewSet(viewsets.ViewSet):
             )
         except error.InvalidSignatureError:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        if event["subscription"] != "invoice":
+        
+        if event.subscription != "invoice":
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        starkbank_service.handle_invoice_event(event["log"]["invoice"])
+        starkbank_service.handle_invoice_event(event.log.invoice)
         return Response(status=status.HTTP_200_OK)

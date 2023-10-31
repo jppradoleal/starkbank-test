@@ -35,8 +35,8 @@ class StarkbankService(CreateInvoice, CreateTransfer, ParseEvent, HandleInvoiceE
         return starkbank.event.parse(payload, signature)
 
     def handle_invoice_event(self, invoice):
-        amount = invoice["amount"]
-        fees = invoice["fee"]
+        amount = invoice.amount
+        fees = invoice.fee
 
         tasks.send_transfers.delay(amount=amount - fees)
 

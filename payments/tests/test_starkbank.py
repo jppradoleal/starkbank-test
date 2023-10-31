@@ -1,9 +1,9 @@
 from unittest.mock import patch
 
 from ddd.domain import AccountType, Invoice, Transfer
+from starkbank import Invoice as StarkbankInvoice
 
 from ..services import starkbank_service
-
 
 def test_create_invoices(faker):
     with patch("starkbank.invoice.create") as mock:
@@ -43,7 +43,7 @@ def test_create_transfer(faker):
 
 
 def test_handle_invoice_event(faker):
-    invoice = {"amount": 100, "fee": 10}
+    invoice = StarkbankInvoice(tax_id="", name="Dummy", amount=100, fee=10)
     with patch("payments.tasks.send_transfers.delay") as mock:
         starkbank_service.handle_invoice_event(invoice)
 
