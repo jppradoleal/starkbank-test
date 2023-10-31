@@ -26,6 +26,10 @@ jobs:
       - name: Install dependencies
         if: steps.setup-python.outputs.cache-hit != 'true'
         run: poetry install -n
+      - name: Generate Private Key File
+        env:
+          STARKBANK_PRIVATE_KEY: ${{secrets.STARKBANK_PRIVATE_KEY}}
+        run: echo $STARKBANK_PRIVATE_KEY > stark-priv-key.pem
       - name: Linting
         run: |
           poetry run isort --check .
