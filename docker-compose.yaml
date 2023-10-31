@@ -1,0 +1,39 @@
+services:
+  app:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+      - 5678:5678
+    depends_on:
+      - redis
+      - localstack
+  redis:
+    image: redis:7.2
+    ports:
+      - 6379:6379
+  localtunnel:
+    image: efrecon/localtunnel
+    links:
+      - app
+    command:
+      --local-host app --port 8000
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4510-4559:4510-4559"
+    environment:
+      - DEBUG=${DEBUG-}
+      - PERSISTANCE=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SNAPSHOT_SAVE_STRATEGY=ON_REQUEST
+      - SNAPSHOT_LOAD_STRATEGY=ON_STARTUP
+      - LOCALSTACK_HOST=localstack:4566
+    volumes:
+      - "./data/localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
