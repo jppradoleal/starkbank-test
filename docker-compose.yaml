@@ -10,7 +10,6 @@ services:
       - 8000:8000
       - 5678:5678
     depends_on:
-      - redis
       - localstack
   celery_worker:
     build:
@@ -26,7 +25,6 @@ services:
     ports:
       - 5679:5679
     depends_on:
-      - redis
       - localstack
   celery_beat:
     build:
@@ -42,18 +40,15 @@ services:
     ports:
       - 5680:5680
     depends_on:
-      - redis
       - localstack
-  redis:
-    image: redis:7.2
-    ports:
-      - 6379:6379
   localtunnel:
     image: efrecon/localtunnel
     links:
       - app
     command:
       --local-host app --port 8000
+    depends_on:
+      - app
   localstack:
     image: localstack/localstack
     ports:

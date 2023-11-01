@@ -52,6 +52,14 @@ Execute the following command to see the invoices being generated and processed
 docker-compose logs -f app celery_worker
 ```
 
+### Docker Compose Breakdown
+
+* app: Our backend.
+* celery_worker: The consumer of the Queue messages.
+* celery_beat: The sender of periodical tasks.
+* localtunnel: Exposes our backend to the internet, like Ngrok.
+* localstack: Simulates AWS, thats our SQS Queue.
+
 ## Running the project - Production Mode
 
 I've left a Helm Chart in the [infrastructure folder](infrastructure/charts/starkbank/) that will set up your cluster with three Deployments:
