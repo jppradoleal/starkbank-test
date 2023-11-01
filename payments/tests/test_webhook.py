@@ -3,9 +3,8 @@ from unittest.mock import MagicMock, patch
 from django.test.client import Client
 from rest_framework.reverse import reverse
 from starkbank.error import InvalidSignatureError
-from starkbank.event.__event import Event, _resource
+from starkbank.event.__event import _resource
 from starkcore.utils.api import from_api_json
-import json
 
 
 class TestWebhook:
@@ -17,19 +16,25 @@ class TestWebhook:
         return_value=from_api_json(
             _resource,
             {
-                "created":None,
-                "is_delivered":False,
-                "workspace_id":None,
-                "id":"000000",
-                "subscription":"invoice",
-                "log":{
-                    "id":"00000000",
-                    "created":None,
-                    "type":None,
-                    "errors":None,
-                    "invoice":{"tax_id": "", "name": "Dummy", "amount": 100, "fee": 10}}
-            }
-        )
+                "created": None,
+                "is_delivered": False,
+                "workspace_id": None,
+                "id": "000000",
+                "subscription": "invoice",
+                "log": {
+                    "id": "00000000",
+                    "created": None,
+                    "type": None,
+                    "errors": None,
+                    "invoice": {
+                        "tax_id": "",
+                        "name": "Dummy",
+                        "amount": 100,
+                        "fee": 10,
+                    },
+                },
+            },
+        ),
     )
     def test_webhook_runs(
         self,
@@ -53,19 +58,20 @@ class TestWebhook:
         return_value=from_api_json(
             _resource,
             {
-                "created":None,
-                "is_delivered":False,
-                "workspace_id":None,
-                "id":"000000",
-                "subscription":"boleto",
-                "log":{
-                    "id":"00000000",
-                    "created":None,
-                    "type":None,
-                    "errors":None,
-                    "boleto":{"tax_id": "", "name": "Dummy", "amount": 100, "fee": 10}}
-            }
-        )
+                "created": None,
+                "is_delivered": False,
+                "workspace_id": None,
+                "id": "000000",
+                "subscription": "boleto",
+                "log": {
+                    "id": "00000000",
+                    "created": None,
+                    "type": None,
+                    "errors": None,
+                    "boleto": {"tax_id": "", "name": "Dummy", "amount": 100, "fee": 10},
+                },
+            },
+        ),
     )
     def test_webhook_process_invoice_events_only(
         self,
@@ -82,9 +88,7 @@ class TestWebhook:
         assert response.status_code == 400
 
     @patch("payments.tasks.send_transfers.delay")
-    @patch(
-        "starkbank.event.parse"
-    )
+    @patch("starkbank.event.parse")
     def test_webhook_ignores_request_without_signature(self, mock_1, mock_2, client):
         data = {}
         response = client.post(self.endpoint, data=data)

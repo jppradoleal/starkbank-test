@@ -19,7 +19,7 @@ class WebhookViewSet(viewsets.ViewSet):
             )
         except error.InvalidSignatureError:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
         if event.subscription != "invoice":
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
