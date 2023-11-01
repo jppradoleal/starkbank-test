@@ -1,0 +1,23 @@
+servers:
+  - backend:
+    name: "backend"
+    port: 8000
+    replicas: 3
+  - worker:
+    name: "worker"
+    command: "worker"
+    replicas: 3
+  - beat:
+    name: "beat"
+    command: "beat"
+    replicas: 1
+
+environment:
+  secret_key: "dummy-secret"
+  broker_url: "sqs://user:pass@"
+  starkbank_private_key: |-
+    -----BEGIN EC PRIVATE KEY-----
+    -----END EC PRIVATE KEY-----
+  resources:
+    memory: "2048M"
+    cpu: "1024m"

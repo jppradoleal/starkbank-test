@@ -1,0 +1,51 @@
+{{- range $i, $value := .Values.servers }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starkbank-{{ $value.name }}
+spec:
+  replicas: {{ $value.replicas }}
+  selector:
+    matchLabels:
+      app: starkbank-{{ $value.name }}
+  template:
+    metadata:
+      labels:
+        app: starkbank-{{ $value.name }}
+    spec:
+      containers:
+      - name: starkbank-{{ $value.name }}
+        image: ghcr.io/jppradoleal/starkbank:latest
+        {{- if $value.command }}
+        command: ["{{ $value.command }}"]
+        {{- end }}
+        env:
+          - name: SECRET_KEY
+            value: {{ required ".Values.environment.secret_key is required" $.Values.environment.secret_key }}
+          - name: BROKER_URL
+            value: {{ required ".Values.environment.broker_url is required" $.Values.environment.broker_url }}
+          - name: STARKBANK_PRIVATE_KEY
+            value: |-
+{{ indent 16 ( required ".Values.environment.starkbank_private_key is required" $.Values.environment.starkbank_private_key ) }}
+        resources:
+          limits:
+            memory: {{ default $.Values.environment.resources.memory "2048M" }}
+            cpu: {{ default $.Values.environment.resources.cpu "1024m" }}
+        {{- if eq $value.name "backend" }}
+        ports:
+        - containerPort: {{ $value.port }}
+        {{- end }}
+
+---
+{{- end }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: starkbank-service
+spec:
+  selector:
+    app: starkbank-backend
+  ports:
+  - port: {{ (first .Values.servers).port }}
+    targetPort: {{ (first .Values.servers).port }}

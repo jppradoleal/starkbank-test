@@ -1,0 +1,4 @@
+apiVersion: v2
+name: starkbank
+description: Chart for the Starkbank app
+version: 0.1.0
