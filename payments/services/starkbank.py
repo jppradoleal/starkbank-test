@@ -42,11 +42,7 @@ class StarkbankService(CreateInvoice, CreateTransfer, ParseEvent, HandleInvoiceE
 
 
 def get_private_key_content():
-    with open(
-        os.getenv("STARKBANK_PRIVATE_KEY_FILE", "./stark-priv-key.pem"), "r"
-    ) as f:
-        private_key_content = f.read()
-    return private_key_content
+    return os.getenv("STARKBANK_PRIVATE_KEY")
 
 
 starkbank_service = StarkbankService(get_private_key_content())

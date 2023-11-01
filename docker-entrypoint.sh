@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -z "$STARKBANK_PRIVATE_KEY" ]; then
+  export STARKBANK_PRIVATE_KEY=$(cat $STARKBANK_PRIVATE_KEY_FILE)
+fi
+
 if [ "$1" = "worker" ]; then
   poetry run \
     python -m debugpy --listen 0.0.0.0:5679 -m \
