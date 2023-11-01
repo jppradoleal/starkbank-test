@@ -25,7 +25,7 @@ jobs:
           cache: 'poetry'
       - name: Install dependencies
         if: steps.setup-python.outputs.cache-hit != 'true'
-        run: poetry install -n
+        run: poetry install -n --with dev
       - name: Generate Private Key File
         env:
           STARKBANK_PRIVATE_KEY: ${{secrets.STARKBANK_PRIVATE_KEY}}
