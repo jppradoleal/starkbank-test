@@ -18,6 +18,7 @@ environment:
   starkbank_private_key: |-
     -----BEGIN EC PRIVATE KEY-----
     -----END EC PRIVATE KEY-----
+  host: "my-host"
   resources:
     memory: "2048M"
     cpu: "1024m"

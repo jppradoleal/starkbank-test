@@ -40,3 +40,24 @@ Execute the following command to see the invoices being generated and processed
 ```bash
 docker-compose logs -f app celery_worker
 ```
+
+## Running the project - Production Mode
+
+I've left a Helm Chart in the [infrastructure folder](infrastructure/charts/starkbank/) that will set up your cluster with 3 Back-end pods, 3 Celery Workers pods, and 1 Celery Beat pod (It's enough, I swear). In the same folder, there is a terraform configuration to spin up a SQS Queue. Pass your Domain, your SQS URL, and the private key file content to the Chart values, and you're up and running!
+
+```bash
+# In the infrastructure/charts folder
+helm install -f path/to/your/values.yaml unique-identifier ./starkbank
+```
+
+```yaml
+# Sample values.yaml file
+environment:
+  secret_key: "YOUR_DJANGO_SECRET_KEY"
+  broker_url: "sqs://{AWS_ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@"
+  starkbank_private_key: |-
+    -----BEGIN EC PRIVATE KEY-----
+    {YOUR_PRIVATE KEY HASH}
+    -----END EC PRIVATE KEY-----
+  host: "{YOUR_DOMAIN}"
+```

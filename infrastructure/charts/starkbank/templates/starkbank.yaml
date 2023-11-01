@@ -42,10 +42,33 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: starkbank-service
+  name: starkbank-backend
 spec:
   selector:
     app: starkbank-backend
   ports:
   - port: {{ (first .Values.servers).port }}
     targetPort: {{ (first .Values.servers).port }}
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: starkbank-backend
+  labels:
+    app: starkbank-backend
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+    - host: {{ required ".Values.environment.host is required" .Values.environment.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: starkbank-backend
+                port:
+                  name: http
