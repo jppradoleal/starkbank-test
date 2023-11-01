@@ -1,3 +1,4 @@
+import os
 from random import randint
 
 import starkbank
@@ -8,6 +9,9 @@ from faker import Faker
 from ddd.domain import AccountType, Invoice, Transfer
 
 from .services import starkbank_service
+
+TRANSFER_TASK_FLUSH_SIZE = int(os.getenv("TRANSFER_TASK_FLUSH_SIZE", 15))
+TRANSFER_TASK_FLUSH_INTERVAL = int(os.getenv("TRANSFER_TASK_FLUSH_INTERVAL", 60 * 60))
 
 
 @shared_task(
@@ -39,8 +43,8 @@ def send_invoices():
 
 @shared_task(
     base=Batches,
-    flush_every=15,
-    flush_interval=10,
+    flush_every=TRANSFER_TASK_FLUSH_SIZE,
+    flush_interval=TRANSFER_TASK_FLUSH_INTERVAL,
     soft_time_limit=15,
     time_limit=30,
     autoretry_for=(

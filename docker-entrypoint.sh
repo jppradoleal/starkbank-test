@@ -1,15 +1,15 @@
 #!/bin/bash
 
-if [ -z "$STARKBANK_PRIVATE_KEY" ]; then
+if [ -z "$STARKBANK_PRIVATE_KEY"] && [ ! -z "$STARKBANK_PRIVATE_KEY_FILE" ]; then
   export STARKBANK_PRIVATE_KEY=$(cat $STARKBANK_PRIVATE_KEY_FILE)
 fi
 
-if ["$ENV" = "dev"]; then
-  if [ "$1" = "worker" ]; then
+if [ "$ENV" == "dev" ]; then
+  if [ "$1" == "worker" ]; then
     poetry run \
       python -m debugpy --listen 0.0.0.0:5679 -m \
         celery -A starkbank_backend worker -l INFO
-  elif [ "$1" = "beat" ]; then
+  elif [ "$1" == "beat" ]; then
     poetry run \
       python -m debugpy --listen 0.0.0.0:5680 -m \
         celery -A starkbank_backend beat -l INFO
@@ -26,9 +26,9 @@ if ["$ENV" = "dev"]; then
   fi
 fi
 
-if [ "$1" = "worker" ]; then
+if [ "$1" == "worker" ]; then
   poetry run python -m celery -A starkbank_backend worker -l INFO
-elif [ "$1" = "beat" ]; then
+elif [ "$1" == "beat" ]; then
   poetry run python -m celery -A starkbank_backend beat -l INFO
 else
   poetry run python -m manage migrate
