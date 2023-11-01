@@ -26,16 +26,14 @@ jobs:
       - name: Install dependencies
         if: steps.setup-python.outputs.cache-hit != 'true'
         run: poetry install -n --with dev
-      - name: Generate Private Key File
-        env:
-          STARKBANK_PRIVATE_KEY: ${{secrets.STARKBANK_PRIVATE_KEY}}
-        run: echo $STARKBANK_PRIVATE_KEY > stark-priv-key.pem
       - name: Linting
         run: |
           poetry run isort --check .
           poetry run black --check .
           poetry run ruff check .
       - name: Tests
+        env:
+          STARKBANK_PRIVATE_KEY: ${{secrets.STARKBANK_PRIVATE_KEY}}
         run: poetry run pytest
 
   build-and-push-image:

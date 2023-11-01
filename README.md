@@ -87,3 +87,16 @@ environment:
     -----END EC PRIVATE KEY-----
   host: "{YOUR_DOMAIN}"
 ```
+
+## Running tests locally
+
+```bash
+docker-compose exec app poetry run pytest
+```
+
+or
+
+```bash
+export STARKBANK_PRIVATE_KEY=$(cat path/to/stark-priv-key.pem)
+poetry run pytest
+```
