@@ -1,3 +1,14 @@
+# Overall Considerations
+
+This was one of the best tests that I've attend for, thanks for the chance to apply my knowledges in Asynchronous processing, API Integration, and DevOps. I also tried to implement the DDD Pattern, but I think that I could've gone even deeper in these concepts. Unfortunately, I've spent my free credits in AWS, GCP, Azure, Linode and DigitalOcean, to compensate that, I tried to ease the process to deploy using Github Actions to upload the Docker image to GHCR, Helm to setup the cluster with the Backend, Worker and Beat, and also terraform to deploy a SQS Queue.
+
+### Problems found
+
+* Everytime the Dashboard backend gives an error, the Dashboard Frontend sends you to the login flow.
+* The Dashboard doesn't allows editing Projects or Webhooks.
+* Even when I setted my IP in the Allowed IP's field when creating the Project, it said that all IP's were allowed.
+* The starkbank.com domain was down several times during development, making the docs unreachable.
+
 # Starkbank Backend Test
 
 This project consists in two async tasks:
@@ -43,7 +54,13 @@ docker-compose logs -f app celery_worker
 
 ## Running the project - Production Mode
 
-I've left a Helm Chart in the [infrastructure folder](infrastructure/charts/starkbank/) that will set up your cluster with 3 Back-end pods, 3 Celery Workers pods, and 1 Celery Beat pod (It's enough, I swear). In the same folder, there is a terraform configuration to spin up a SQS Queue. Pass your Domain, your SQS URL, and the private key file content to the Chart values, and you're up and running!
+I've left a Helm Chart in the [infrastructure folder](infrastructure/charts/starkbank/) that will set up your cluster with three Deployments:
+
+* Back-end (3 replicas) - Our back-end, which has 3 subprocess, so we have 9 workers in total;
+* Celery Worker (3 replicas) - The consumer of the tasks we sent to the Queue;
+* Celery Beat (1 replica) - It's job is to send our periodic tasks to the Queue.
+
+In the same folder, there is a terraform configuration to spin up a SQS Queue. Pass a valid domain (or one defined in your `/etc/hosts` file), your SQS URL, and the private key file content to the Chart values, and you're up and running!
 
 ```bash
 # In the infrastructure/charts folder
@@ -51,7 +68,8 @@ helm install -f path/to/your/values.yaml unique-identifier ./starkbank
 ```
 
 ```yaml
-# Sample values.yaml file
+# Sample values.yaml file.
+# Be sure to exclude it from version control, since it contains sensitive data.
 environment:
   secret_key: "YOUR_DJANGO_SECRET_KEY"
   broker_url: "sqs://{AWS_ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@"
