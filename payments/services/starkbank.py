@@ -1,9 +1,9 @@
 import os
 
 import starkbank
-from starkbank import Invoice, Transfer
+from starkbank import Event, Invoice, Transfer, error
 
-from payments import tasks
+from payments import exceptions, tasks
 
 
 class StarkbankService:
@@ -23,9 +23,21 @@ class StarkbankService:
         return starkbank.transfer.create(transfers)
 
     def parse_event(self, payload, signature) -> starkbank.Event:
-        return starkbank.event.parse(payload, signature)
+        try:
+            event = starkbank.event.parse(payload, signature)
+        except error.InvalidSignatureError:
+            raise exceptions.InvalidSignatureError()
 
-    def handle_invoice_event(self, invoice):
+        return event
+
+    def handle_invoice_event(self, data, digital_signature):
+        event: Event = self.parse_event(data, digital_signature)
+
+        if event.subscription != "invoice":
+            raise exceptions.EventNotHandledError()
+
+        invoice = event.log.invoice
+
         amount = invoice.amount
         fees = invoice.fee
 
