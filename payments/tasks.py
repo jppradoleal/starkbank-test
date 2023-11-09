@@ -5,8 +5,7 @@ import starkbank
 from celery import shared_task
 from celery_batches import Batches
 from faker import Faker
-
-from ddd.domain import AccountType, Invoice, Transfer
+from starkbank import Invoice, Transfer
 
 from .services import starkbank_service
 
@@ -62,7 +61,7 @@ def send_transfers(requests):
     transfer = Transfer(
         amount=sum(amounts),
         account_number="6341320293482496",
-        account_type=AccountType.PAYMENT,
+        account_type="payment",
         bank_code="20018183",
         branch_code="0001",
         tax_id="20.018.183/0001-80",

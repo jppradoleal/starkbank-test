@@ -1,13 +1,12 @@
 import os
 
 import starkbank
+from starkbank import Invoice, Transfer
 
-from ddd.domain import Invoice, Transfer
-from ddd.use_cases import CreateInvoice, CreateTransfer, HandleInvoiceEvent, ParseEvent
 from payments import tasks
 
 
-class StarkbankService(CreateInvoice, CreateTransfer, ParseEvent, HandleInvoiceEvent):
+class StarkbankService:
     __project = None
 
     def __init__(self, private_key) -> None:
@@ -18,18 +17,10 @@ class StarkbankService(CreateInvoice, CreateTransfer, ParseEvent, HandleInvoiceE
         starkbank.user = self.__project
 
     def create_invoices(self, invoices: list[Invoice]):
-        invoice_objects = [
-            starkbank.Invoice(**invoice.asdict()) for invoice in invoices
-        ]
-
-        return starkbank.invoice.create(invoice_objects)
+        return starkbank.invoice.create(invoices)
 
     def create_transfers(self, transfers: list[Transfer]):
-        transfer_objects = [
-            starkbank.Transfer(**transfer.asdict()) for transfer in transfers
-        ]
-
-        return starkbank.transfer.create(transfer_objects)
+        return starkbank.transfer.create(transfers)
 
     def parse_event(self, payload, signature) -> starkbank.Event:
         return starkbank.event.parse(payload, signature)

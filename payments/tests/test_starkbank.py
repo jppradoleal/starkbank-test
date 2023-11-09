@@ -1,8 +1,8 @@
 from unittest.mock import patch
 
+from starkbank import Invoice
 from starkbank import Invoice as StarkbankInvoice
-
-from ddd.domain import AccountType, Invoice, Transfer
+from starkbank import Transfer
 
 from ..services import starkbank_service
 
@@ -36,7 +36,7 @@ def test_create_transfer(faker):
                     bank_code="20018183",
                     branch_code="0001",
                     account_number="6341320293482496",
-                    account_type=AccountType.PAYMENT,
+                    account_type="payment",
                 )
             ]
         )
