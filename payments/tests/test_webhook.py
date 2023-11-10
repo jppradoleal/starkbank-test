@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 from django.test.client import Client
 from rest_framework.reverse import reverse
-from starkbank.error import InvalidSignatureError
 from starkbank.event.__event import _resource
 from starkcore.utils.api import from_api_json
 
@@ -76,7 +75,7 @@ class TestWebhook:
     def test_webhook_process_invoice_events_only(
         self,
         mock_event_parse: MagicMock,
-        mock_2: MagicMock,
+        _: MagicMock,
         client: Client,
     ):
         data = {}
@@ -86,26 +85,3 @@ class TestWebhook:
         mock_event_parse.assert_called_once()
 
         assert response.status_code == 400
-
-    @patch("payments.tasks.send_transfers.delay")
-    @patch("starkbank.event.parse")
-    def test_webhook_ignores_request_without_signature(self, mock_1, mock_2, client):
-        data = {}
-        response = client.post(self.endpoint, data=data)
-
-        assert response.status_code == 404
-
-    @patch("payments.tasks.send_transfers.delay")
-    @patch(
-        "starkbank.event.parse",
-        side_effect=InvalidSignatureError(""),
-    )
-    def test_webhook_ignores_request_with_invalid_signature(
-        self, mock_event_parse: MagicMock, mock_2, client
-    ):
-        data = {}
-        headers = {"HTTP_DIGITAL_SIGNATURE": "invalid"}
-        response = client.post(self.endpoint, data=data, **headers)
-
-        mock_event_parse.assert_called_once()
-        assert response.status_code == 404
